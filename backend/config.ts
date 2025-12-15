@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   app: {
     port: 3006,
   },
@@ -8,5 +8,6 @@ module.exports = {
     port: 27017,
     name: "shop",
     password: "",
-  }
+  },
 };
+export default config;
