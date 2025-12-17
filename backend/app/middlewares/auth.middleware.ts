@@ -14,7 +14,7 @@ export const authRequired = (
   next: NextFunction
 ) => {
   const header = req.headers.authorization;
-  if (!header || !header.startsWith("Bearer")) {
+  if (!header || !header.startsWith("Bearer ")) {
     return res.status(401).json({ message: "TOken missing" });
   }
 

@@ -15,16 +15,8 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      address,
-      phoneNumber,
-      companyName,
-      nip,
-    } = req.body;
+    const { firstName, lastName, email, password, address, companyName, nip } =
+      req.body;
 
     if (!firstName || !lastName || !email || !password || !address) {
       return res.status(400).json({ message: "Missing required fields" });
