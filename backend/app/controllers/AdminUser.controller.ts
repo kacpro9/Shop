@@ -128,7 +128,7 @@ export const updateUserAsAdmin = async (
 };
 
 //DELETE /api/admin/users/:id
-export const deleteUser = async (
+export const deleteUserAsAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
