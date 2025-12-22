@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { User } from "../models/User.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { validateNip } from "../utils/validateNip";
 
 //GET /api/users/me
 
@@ -33,6 +34,12 @@ export const updateMe = async (
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const { firstName, lastName, companyName, nip, address } = req.body;
+
+    if (nip !== undefined && nip !== null && nip !== "") {
+      if (!validateNip(String(nip))) {
+        return res.status(400).json({ message: "Invalid NIP number" });
+      }
+    }
 
     const updates: any = {};
     if (firstName !== undefined) updates.firstName = firstName;

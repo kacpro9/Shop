@@ -1,4 +1,5 @@
 import { Schema, model, Document } from "mongoose";
+import { validateNip } from "../utils/validateNip";
 
 interface IAddress {
   street: string;
@@ -32,7 +33,16 @@ const UserSchema = new Schema<IUser>(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     companyName: { type: String },
-    nip: { type: String },
+    nip: {
+      type: String,
+      validate: {
+        validator: function (v: string) {
+          if (!v) return true;
+          return validateNip(v);
+        },
+        message: "Invalid NIP number",
+      },
+    },
     email: { type: String, required: true, unique: true, sparse: true },
     password: { type: String, required: true },
     role: { type: String, enum: ["admin", "user"], default: "user" },

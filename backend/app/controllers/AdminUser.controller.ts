@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { User } from "../models/User.model";
+import { validateNip } from "../utils/validateNip";
+import bcrypt from "bcryptjs";
 
 //GET /api/admin/users
 export const listUsers = async (
@@ -33,7 +35,7 @@ export const getUserById = async (
 };
 
 //POST /api/admin/users
-export const createUser = async (
+export const createUserAsAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -54,8 +56,10 @@ export const createUser = async (
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const normalizedEmail = String(email).toLowerCase().trim();
+
     const exists = await User.findOne({
-      email: String(email).toLowerCase().trim(),
+      email: normalizedEmail,
     });
     if (exists) {
       return res
@@ -63,12 +67,20 @@ export const createUser = async (
         .json({ message: "User with this email already exists" });
     }
 
+    if (nip !== undefined && nip !== null && nip !== "") {
+      if (!validateNip(String(nip))) {
+        return res.status(400).json({ message: "Invalid NIP number" });
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const created = await User.create({
       firstName,
       lastName,
-      email: String(email).toLowerCase().trim(),
-      password,
-      role: role ?? "user",
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: role === "admin" ? "admin" : "user",
       address, //{street, suite?, city, zipcode}
       companyName,
       nip,
@@ -86,16 +98,13 @@ export const updateUserAsAdmin = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      role,
-      address,
-      companyName,
-      nip,
-    } = req.body;
+    const { firstName, lastName, role, address, companyName, nip } = req.body;
+
+    if (nip !== undefined && nip !== null && nip !== "") {
+      if (!validateNip(String(nip))) {
+        return res.status(400).json({ message: "Invalid NIP number" });
+      }
+    }
 
     const updates: any = {};
     if (firstName !== undefined) updates.firstName = firstName;
