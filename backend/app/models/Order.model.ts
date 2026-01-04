@@ -10,6 +10,8 @@ export interface IOrder extends Document {
   }[];
   totalPrice: number;
   status: "pending" | "shipped" | "delivered" | "cancelled";
+  paymentStatus: "pending" | "completed" | "failed";
+  estimatedFulfillmentDays?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +34,12 @@ const OrderSchema = new Schema<IOrder>(
       enum: ["pending", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed"],
+      default: "pending",
+    },
+    estimatedFulfillmentDays: { type: Number, required: false },
   },
   { timestamps: true }
 );
