@@ -11,17 +11,20 @@ export const createPart = async (
     const { name, description, price, stockQuantity, dateOfDelivery } =
       req.body;
 
-    if (!name || price === undefined || stockQuantity === undefined) {
+    const priceNum = Number(price);
+    const stockQuantityNum = Number(stockQuantity);
+
+    if (!name || Number.isNaN(priceNum) || Number.isNaN(stockQuantityNum)) {
       return res
         .status(400)
-        .json({ message: "Name, price and stockQuantity are required" });
+        .json({ message: "Name, price and stock quantity are required" });
     }
 
     const created = await Part.create({
       name,
       description,
-      price,
-      stockQuantity,
+      price: priceNum,
+      stockQuantity: stockQuantityNum,
       dateOfDelivery,
     });
 
