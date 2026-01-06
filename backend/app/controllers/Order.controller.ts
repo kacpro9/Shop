@@ -154,3 +154,39 @@ export const payOrder = async (
     next(error);
   }
 };
+
+//DELETE /api/orders/:id - cancel order
+export const cancelOrder = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (order.user.toString() !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    if (["shipped", "delivered"].includes(order.status)) {
+      return res.status(400).json({
+        message: "Cannot cancel an order that is already shipped or delivered",
+      });
+    }
+
+    if (order.status === "cancelled") {
+      return res.status(400).json({ message: "Order already canceled" });
+    }
+
+    order.status = "cancelled";
+    await order.save();
+
+    return res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
