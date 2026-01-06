@@ -79,8 +79,7 @@ export const login = async (
 
     const token = signToken({ id: user._id.toString(), role: user.role });
 
-    // return user data without password
-    const safeUser = await User.findById(user._id);
+    const { password: _, ...safeUser } = user.toObject();
 
     return res.status(200).json({ token, user: safeUser });
   } catch (error) {
